@@ -1,0 +1,7 @@
+apscheduler
+boto3
+hikari
+hikari-lightbulb
+pandas
+pillow
+psycopg
