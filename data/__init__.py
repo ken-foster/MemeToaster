@@ -1,4 +1,4 @@
-from os import environ, path
+from os import environ
 from random import choice
 
 import boto3
@@ -81,6 +81,18 @@ ORDER BY count(tf.filename_id) DESC, tg.tag;"""
 
     return(tags)
 
+
+def log_request(tag, caption, success, conn):
+
+    log_tag_string = """
+    INSERT INTO request_log (tag, caption, success)
+    VALUES (%s, %s, %s)"""
+
+    with conn.cursor() as curs:
+        curs.execute(log_tag_string, (tag, caption, success,))
+    conn.commit()
+
+
 def query_filename_by_tag(tag, conn):
     query_by_tag = """
     SELECT filename FROM filename AS f
@@ -92,11 +104,43 @@ def query_filename_by_tag(tag, conn):
 
     with conn.cursor() as curs:
         curs.execute(query_by_tag, (tag,))
-        images = [im[0] for im in curs.fetchall()]
-
-    imageChoice = choice(images)
+        result = curs.fetchall()
+        
+    if result:
+        images = [im[0] for im in result]
+        imageChoice = choice(images)
+    else:
+        imageChoice = None
 
     return(imageChoice)
+
+
+def query_tag_by_filename(filename, conn):
+    query_by_filename = """
+SELECT tag FROM tag as tg
+LEFT JOIN tag_filename AS tf
+ON tg.id = tf.tag_id
+LEFT JOIN filename AS f
+ON tf.filename_id = f.id
+WHERE f.filename = %s;"""
+
+    with conn.cursor() as curs:
+        curs.execute(query_by_filename, (filename,))
+        result = curs.fetchall()
+
+    if result:
+        tags = [tg[0] for tg in result]
+    else:
+        tags = []
+
+    return(tags)
+
+
+def boto_ssm(Name):
+    ssm = boto3.client("ssm",region_name="us-west-1")
+    value = ssm.get_parameter(Name=Name,
+    WithDecryption=True)["Parameter"]["Value"]
+    return(value)
 
 
 def create_tag_list(conn):
@@ -111,7 +155,7 @@ def create_tag_list(conn):
         num_pics = cur.fetchone()[0]
 
     # Write to StringIO, Create S3 session, and upload
-    inptstr = 'empty.txt'
+    inptstr = 'data/tags.txt'
     with open(inptstr, 'w') as newfile:
 
         newfile.write(f"Number of tags: {num_tags}\n\n")
@@ -120,10 +164,6 @@ def create_tag_list(conn):
 
         for tag, count in tagsList:
             newfile.write(f"{tag}\n{count}\n\n")
-
-    s3 = boto3.Session().resource('s3')
-
-    s3.Bucket('memetoaster').upload_file(inptstr, "tags.txt")
 
 conn = sql_connect()
 create_tag_list(conn)

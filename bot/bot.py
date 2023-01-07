@@ -1,17 +1,21 @@
+from os import environ
 import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-import boto3
 import hikari
 import lightbulb
 
-DISCORD_TOKEN = boto3.client("ssm", 
-    region_name="us-west-1").get_parameter(
-        Name="DISCORD_TOKEN",
-        WithDecryption=True)["Parameter"]["Value"]
+from data import boto_ssm
 
-HOME_GUILD_ID = "833477250841837598"
-STDOUT_CHANNEL_ID = "872682916788973638"
+__VERSION__ = environ['VERSION']
+if __VERSION__ == "EC2":
+    PREFIX = "toast."
+elif __VERSION__ == "LOCAL":
+    PREFIX = "test."
+
+DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN")
+HOME_GUILD_ID = boto_ssm("HOME_GUILD_ID")
+STDOUT_CHANNEL_ID = boto_ssm("STDOUT_CHANNEL_ID")
 
 class Bot(lightbulb.BotApp):
     def __init__(self) -> None:
@@ -24,7 +28,7 @@ class Bot(lightbulb.BotApp):
         )
 
         super().__init__(
-            prefix = "test.",
+            prefix = PREFIX,
             token = DISCORD_TOKEN,
             intents = intents,
         )
