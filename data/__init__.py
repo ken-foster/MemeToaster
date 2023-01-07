@@ -5,28 +5,35 @@ import boto3
 from pandas import DataFrame
 from psycopg import connect
 
+
+def boto_ssm(Name, ssm):
+    value = ssm.get_parameter(Name=Name,
+    WithDecryption=True)["Parameter"]["Value"]
+    return(value)
+
+
 def sql_connect():
 
+    port = 5432
+
     __VERSION__ = environ["VERSION"]
+    ssm = boto3.client("ssm",region_name="us-west-1")
 
     if __VERSION__ == "EC2":
 
-        port = 5432
         user = "postgres"
         dbname = "test"
 
-        ssm = boto3.client("ssm", region_name="us-west-1")
-        host = ssm.get_parameter(Name="POSTGRESQL_HOST",
-                                WithDecryption=True)["Parameter"]["Value"]
-        password = ssm.get_parameter(Name="POSTGRESQL_PASSWORD",
-                                WithDecryption=True)["Parameter"]["Value"]
+        POSTGRESQL_HOST = boto_ssm("POSTGRESQL_HOST_EC2", ssm)
+        POSTGRESQL_PASSWORD = boto_ssm("POSTGRESQL_PASSWORD_EC2", ssm)
+
     else:
-        port = 5432
+
         user = "kenny"
         dbname = "MemeToasterTest"
 
-        POSTGRESQL_HOST = "localhost"
-        POSTGRESQL_PASSWORD = "admin"
+        POSTGRESQL_HOST = boto_ssm("POSTGRESQL_HOST_LOCAL", ssm)
+        POSTGRESQL_PASSWORD = boto_ssm("POSTGRESQL_PASSWORD_LOCAL", ssm)
 
     conn = connect(
         host = POSTGRESQL_HOST,
@@ -136,11 +143,7 @@ WHERE f.filename = %s;"""
     return(tags)
 
 
-def boto_ssm(Name):
-    ssm = boto3.client("ssm",region_name="us-west-1")
-    value = ssm.get_parameter(Name=Name,
-    WithDecryption=True)["Parameter"]["Value"]
-    return(value)
+
 
 
 def create_tag_list(conn):

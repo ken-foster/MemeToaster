@@ -2,6 +2,7 @@ from os import environ
 import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import boto3
 import hikari
 import lightbulb
 
@@ -13,9 +14,10 @@ if __VERSION__ == "EC2":
 elif __VERSION__ == "LOCAL":
     PREFIX = "test."
 
-DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN")
-HOME_GUILD_ID = boto_ssm("HOME_GUILD_ID")
-STDOUT_CHANNEL_ID = boto_ssm("STDOUT_CHANNEL_ID")
+ssm = boto3.client("ssm",region_name="us-west-1")
+DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN", ssm)
+HOME_GUILD_ID = boto_ssm("HOME_GUILD_ID", ssm)
+STDOUT_CHANNEL_ID = boto_ssm("STDOUT_CHANNEL_ID", ssm)
 
 class Bot(lightbulb.BotApp):
     def __init__(self) -> None:
