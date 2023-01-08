@@ -12,12 +12,12 @@ ssm = boto3.client("ssm",region_name="us-west-1")
 
 path = os.path.join(os.getcwd(), "version.txt")
 with open(path,"r") as f:
-    __VERSION__ = f.read()
+    version = f.read()
 
-if __VERSION__ == "EC2":
+if version == "EC2":
     PREFIX = "toast."
     DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_PRD",ssm)
-elif __VERSION__ == "LOCAL":
+elif version == "LOCAL":
     PREFIX = "test."
     DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_DEV",ssm)
 

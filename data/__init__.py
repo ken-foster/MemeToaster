@@ -17,16 +17,16 @@ def sql_connect():
 
     path = os.path.join(os.getcwd(), "version.txt")
     with open(path,"r") as f:
-        __VERSION__ = f.read()
+        version = f.read()
 
     ssm = boto3.client("ssm",region_name="us-west-1")
 
-    if __VERSION__ == "EC2":
+    if version == "EC2":
 
         POSTGRESQL_HOST = boto_ssm("POSTGRESQL_HOST_EC2", ssm)
         POSTGRESQL_PASSWORD = boto_ssm("POSTGRESQL_PASSWORD_EC2", ssm)
 
-    elif __VERSION__ == "LOCAL":
+    elif version == "LOCAL":
 
         POSTGRESQL_HOST = boto_ssm("POSTGRESQL_HOST_LOCAL", ssm)
         POSTGRESQL_PASSWORD = boto_ssm("POSTGRESQL_PASSWORD_LOCAL", ssm)
