@@ -10,7 +10,9 @@ from data import boto_ssm
 
 ssm = boto3.client("ssm",region_name="us-west-1")
 
-__VERSION__ = environ['VERSION']
+with open("version.txt","r") as f:
+    __VERSION__ = f.read()
+
 if __VERSION__ == "EC2":
     PREFIX = "toast."
     DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_PRD",ssm)

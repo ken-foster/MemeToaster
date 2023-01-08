@@ -16,8 +16,11 @@ plugin = lightbulb.Plugin("Functions")
 @lightbulb.command(name="version", description="For testing env vars")
 @lightbulb.implements(lightbulb.PrefixCommand)
 async def command_version(ctx: lightbulb.Context) -> None:
+
+    with open("version.txt","r") as f:
+        __VERSION__ = f.read()
     
-    await ctx.respond(environ["VERSION"])
+    await ctx.respond(__VERSION__)
 
 
 @plugin.command
