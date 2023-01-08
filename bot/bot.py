@@ -1,4 +1,3 @@
-from os import environ
 import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler

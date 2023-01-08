@@ -1,15 +1,13 @@
-from os import environ
+
 from random import choice
 
 import boto3
 from psycopg import connect
 
-
 def boto_ssm(Name, ssm):
     value = ssm.get_parameter(Name=Name,
     WithDecryption=True)["Parameter"]["Value"]
     return(value)
-
 
 def sql_connect():
 
