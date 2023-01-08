@@ -2,7 +2,6 @@ from os import environ
 from random import choice
 
 import boto3
-from pandas import DataFrame
 from psycopg import connect
 
 
@@ -62,9 +61,6 @@ def sql_tags(conn,
         curs.execute(query)
         tags = curs.fetchall()
 
-    if output == "DataFrame":
-        tags = DataFrame(tags, columns = columns)
-
     return(tags)
 
 
@@ -82,9 +78,6 @@ ORDER BY count(tf.filename_id) DESC, tg.tag;"""
     with conn.cursor() as curs:
         curs.execute(query_str)
         tags = curs.fetchall()
-
-    if output == "DataFrame":
-        tags = DataFrame(tags, columns = ['tag','count'])
 
     return(tags)
 
@@ -141,9 +134,6 @@ WHERE f.filename = %s;"""
         tags = []
 
     return(tags)
-
-
-
 
 
 def create_tag_list(conn):
