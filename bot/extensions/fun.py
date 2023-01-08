@@ -1,4 +1,5 @@
 from io import BytesIO
+from os import environ
 import string
 
 import boto3
@@ -10,6 +11,14 @@ from bot.pic import render
 from data import *
 
 plugin = lightbulb.Plugin("Functions")
+
+@plugin.command
+@lightbulb.command(name="version")
+@lightbulb.implements(lightbulb.PrefixCommand)
+async def command_version(ctx: lightbulb.Context) -> None:
+    
+    await ctx.respond(environ["VERSION"])
+
 
 @plugin.command
 @lightbulb.command(name = "tags", description = "Get a link to a list of all available tags")
