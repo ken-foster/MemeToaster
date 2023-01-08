@@ -13,7 +13,7 @@ from data import *
 plugin = lightbulb.Plugin("Functions")
 
 @plugin.command
-@lightbulb.command(name="version")
+@lightbulb.command(name="version", description="For testing env vars")
 @lightbulb.implements(lightbulb.PrefixCommand)
 async def command_version(ctx: lightbulb.Context) -> None:
     
