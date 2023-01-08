@@ -1,14 +1,14 @@
-Number of tags: 905
+Number of tags: 904
 
 Total number of pictures: 630
 
 Number of pictures per tag:
 
 evil
-41
+40
 
 hungry
-34
+33
 
 cute
 31
@@ -20,13 +20,13 @@ wat
 28
 
 happy
-27
+26
 
 angry
-26
+25
 
 duck
-26
+25
 
 sad
 24
@@ -47,7 +47,7 @@ scared
 22
 
 horny
-21
+20
 
 computer
 19
