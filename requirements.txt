@@ -3,4 +3,4 @@ boto3
 hikari
 hikari-lightbulb
 pillow
-psycopg
+psycopg[binary]
