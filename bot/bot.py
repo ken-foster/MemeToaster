@@ -10,12 +10,12 @@ from data import boto_ssm
 
 ssm = boto3.client("ssm",region_name="us-west-1")
 
-version = os.environ["VERSION"]
+pm2 = os.getenv("PM2_HOME")
 
-if version == "EC2":
+if pm2:
     PREFIX = "toast."
     DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_PRD",ssm)
-elif version == "LOCAL":
+else:
     PREFIX = "test."
     DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_DEV",ssm)
 

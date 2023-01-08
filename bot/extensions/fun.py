@@ -17,8 +17,8 @@ plugin = lightbulb.Plugin("Functions")
 @lightbulb.implements(lightbulb.PrefixCommand)
 async def command_version(ctx: lightbulb.Context) -> None:
 
-    version = os.environ["VERSION"]
-    await ctx.respond(version)
+    pm2 = os.getenv("PM2_HOME")
+    await ctx.respond(pm2)
 
 
 @plugin.command

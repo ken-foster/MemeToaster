@@ -15,16 +15,16 @@ def sql_connect():
     user = "postgres"
     dbname = "MemeToaster"
 
-    version = os.environ["VERSION"]
+    pm2 = os.getenv("PM2_HOME")
 
     ssm = boto3.client("ssm",region_name="us-west-1")
 
-    if version == "EC2":
+    if pm2:
 
         POSTGRESQL_HOST = boto_ssm("POSTGRESQL_HOST_EC2", ssm)
         POSTGRESQL_PASSWORD = boto_ssm("POSTGRESQL_PASSWORD_EC2", ssm)
 
-    elif version == "LOCAL":
+    else:
 
         POSTGRESQL_HOST = boto_ssm("POSTGRESQL_HOST_LOCAL", ssm)
         POSTGRESQL_PASSWORD = boto_ssm("POSTGRESQL_PASSWORD_LOCAL", ssm)
