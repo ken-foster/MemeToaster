@@ -1,3 +1,4 @@
+import os
 import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -5,11 +6,12 @@ import boto3
 import hikari
 import lightbulb
 
-from data import *
+from data import boto_ssm
 
 ssm = boto3.client("ssm",region_name="us-west-1")
 
-with open("version.txt","r") as f:
+path = os.path.join(os.getcwd(), "version.txt")
+with open(path,"r") as f:
     __VERSION__ = f.read()
 
 if __VERSION__ == "EC2":

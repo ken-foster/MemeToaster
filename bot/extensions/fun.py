@@ -17,7 +17,8 @@ plugin = lightbulb.Plugin("Functions")
 @lightbulb.implements(lightbulb.PrefixCommand)
 async def command_version(ctx: lightbulb.Context) -> None:
 
-    with open("version.txt","r") as f:
+    path = os.path.join(os.getcwd(), "version.txt")
+    with open(path,"r") as f:
         __VERSION__ = f.read()
     
     await ctx.respond(__VERSION__)

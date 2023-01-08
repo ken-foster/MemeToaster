@@ -1,4 +1,4 @@
-
+import os
 from random import choice
 
 import boto3
@@ -15,7 +15,8 @@ def sql_connect():
     user = "postgres"
     dbname = "MemeToaster"
 
-    with open("version.txt","r") as f:
+    path = os.path.join(os.getcwd(), "version.txt")
+    with open(path,"r") as f:
         __VERSION__ = f.read()
 
     ssm = boto3.client("ssm",region_name="us-west-1")
