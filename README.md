@@ -1,7 +1,7 @@
 # MemeToaster
 
 Add MemeToaster to your server by following this link:
-https://discord.com/api/oauth2/authorize?client_id=920060661294309378&permissions=52224&scope=bot%20applications.commands
+https://discord.com/api/oauth2/authorize?client_id=920060661294309378&permissions=2147535872&scope=bot
 
 This is a Discord bot you can use to spice up your conversations with captioned pictures, aka 'memes'. Enter in a picture category and a caption, and MemeToaster will randomly choose a picture from the category you supplied and caption it with the message you type.
 
