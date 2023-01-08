@@ -164,4 +164,4 @@ utils/
 # End of https://www.toptal.com/developers/gitignore/api/python,linux
 
 # File that must stay the same between dev/prod machines
-version.txt
+v.txt
