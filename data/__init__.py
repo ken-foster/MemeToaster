@@ -14,22 +14,18 @@ def boto_ssm(Name, ssm):
 def sql_connect():
 
     port = 5432
+    user = "postgres"
+    dbname = "MemeToaster"
 
     __VERSION__ = environ["VERSION"]
     ssm = boto3.client("ssm",region_name="us-west-1")
 
     if __VERSION__ == "EC2":
 
-        user = "postgres"
-        dbname = "test"
-
         POSTGRESQL_HOST = boto_ssm("POSTGRESQL_HOST_EC2", ssm)
         POSTGRESQL_PASSWORD = boto_ssm("POSTGRESQL_PASSWORD_EC2", ssm)
 
     else:
-
-        user = "kenny"
-        dbname = "MemeToasterTest"
 
         POSTGRESQL_HOST = boto_ssm("POSTGRESQL_HOST_LOCAL", ssm)
         POSTGRESQL_PASSWORD = boto_ssm("POSTGRESQL_PASSWORD_LOCAL", ssm)

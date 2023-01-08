@@ -8,14 +8,16 @@ import lightbulb
 
 from data import boto_ssm
 
+ssm = boto3.client("ssm",region_name="us-west-1")
+
 __VERSION__ = environ['VERSION']
 if __VERSION__ == "EC2":
     PREFIX = "toast."
+    DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_PRD")
 elif __VERSION__ == "LOCAL":
     PREFIX = "test."
+    DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_DEV")
 
-ssm = boto3.client("ssm",region_name="us-west-1")
-DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN", ssm)
 HOME_GUILD_ID = boto_ssm("HOME_GUILD_ID", ssm)
 STDOUT_CHANNEL_ID = boto_ssm("STDOUT_CHANNEL_ID", ssm)
 
