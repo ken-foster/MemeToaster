@@ -11,9 +11,6 @@ def boto_ssm(Name, ssm):
 
 def sql_connect():
 
-    global POSTGRESQL_HOST
-    global POSTGRESQL_PASSWORD
-
     port = 5432
     user = "postgres"
     dbname = "MemeToaster"

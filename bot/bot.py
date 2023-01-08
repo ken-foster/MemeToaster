@@ -5,7 +5,7 @@ import boto3
 import hikari
 import lightbulb
 
-from data import boto_ssm
+from data import *
 
 ssm = boto3.client("ssm",region_name="us-west-1")
 
