@@ -105,7 +105,10 @@ def query_filename_by_tag(tag, conn):
         images = [im[0] for im in result]
         imageChoice = choice(images)
     else:
-        imageChoice = None
+        with conn.cursor() as curs:
+            curs.execute("SELECT filename FROM filename")
+            result = curs.fetchall()
+            imageChoice = choice(result)[0]
 
     return(imageChoice)
 
@@ -129,6 +132,9 @@ WHERE f.filename = %s;"""
         tags = []
 
     return(tags)
+
+
+
 
 
 def create_tag_list(conn):

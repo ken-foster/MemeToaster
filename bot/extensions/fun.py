@@ -52,41 +52,31 @@ async def command_meme(ctx: lightbulb.Context) -> None:
 
         imageChoice = query_filename_by_tag(tag, conn)
 
-        if imageChoice is None:
-            await ctx.respond(f"""
-Sorry {ctx.author.mention}, I don't have any pictures for '{tag}'...yet!
-Use toast.help or toast.tags for a list of tags
-""")
+        await ctx.respond("Toasting meme...")
 
-            log_request(tag=tag, caption=caption,
-                        success="0", conn=conn)
+        tags = query_tag_by_filename(imageChoice, conn)
 
-        else:
-            await ctx.respond("Toasting meme...")
+        tagsHashed = ["#" + t for t in tags]
+        tagsSend = " ".join(tagsHashed)
 
-            tags = query_tag_by_filename(imageChoice, conn)
+        s3 = boto3.Session().resource("s3")
 
-            tagsHashed = ["#" + t for t in tags]
-            tagsSend = " ".join(tagsHashed)
+        with BytesIO() as imageBinaryDload:
+            with BytesIO() as imageBinarySend:
+                s3.Bucket('memetoaster').download_fileobj('images/db/' + imageChoice, imageBinaryDload)
+                render(imageBinaryDload, caption).save(imageBinarySend, 'JPEG')
 
-            s3 = boto3.Session().resource("s3")
+                imageBinarySend.seek(0)
 
-            with BytesIO() as imageBinaryDload:
-                with BytesIO() as imageBinarySend:
-                    s3.Bucket('memetoaster').download_fileobj('images/db/' + imageChoice, imageBinaryDload)
-                    render(imageBinaryDload, caption).save(imageBinarySend, 'JPEG')
+                embed = hikari.Embed()
+                embed.set_footer(tagsSend)
+                embed.set_image(imageBinarySend)
+                await ctx.respond(embed)
 
-                    imageBinarySend.seek(0)
+        log_request(tag=tag, caption=caption,
+                    success="1", conn=conn)
 
-                    embed = hikari.Embed()
-                    embed.set_footer(tagsSend)
-                    embed.set_image(imageBinarySend)
-                    await ctx.respond(embed)
-
-            log_request(tag=tag, caption=caption,
-                        success="1", conn=conn)
-
-            conn.close()
+        conn.close()
 
     
 
