@@ -15,9 +15,7 @@ def sql_connect():
     user = "postgres"
     dbname = "MemeToaster"
 
-    path = os.path.join(os.getcwd(), "version.txt")
-    with open(path,"r") as f:
-        version = f.read()
+    version = os.environ["VERSION"]
 
     ssm = boto3.client("ssm",region_name="us-west-1")
 

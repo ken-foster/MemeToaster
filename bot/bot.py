@@ -10,9 +10,7 @@ from data import boto_ssm
 
 ssm = boto3.client("ssm",region_name="us-west-1")
 
-path = os.path.join(os.getcwd(), "version.txt")
-with open(path,"r") as f:
-    version = f.read()
+version = os.environ["VERSION"]
 
 if version == "EC2":
     PREFIX = "toast."
