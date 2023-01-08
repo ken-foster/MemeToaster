@@ -3,7 +3,9 @@
 Add MemeToaster to your server by following this link:
 https://discord.com/api/oauth2/authorize?client_id=920060661294309378&permissions=2147535872&scope=bot
 
-This is a Discord bot you can use to spice up your conversations with captioned pictures, aka 'memes'. Enter in a picture category and a caption, and MemeToaster will randomly choose a picture from the category you supplied and caption it with the message you type.
+This is a Discord bot you can use to spice up your conversations with captioned pictures, aka 'memes'. Enter in a picture category (or "tag") and a caption, and MemeToaster will randomly choose a picture from the category you supplied and caption it with the message you type.
+
+If there's no pictures matching the tag supplied, a purely random picture will be chosen.
 
 # Commands
 ## meme
@@ -57,4 +59,4 @@ The following permissions are necessary for MemeToaster to work as intended:
 - Attach Files
 
 # About
-This bot was developed using Python, relying on the hikari and lightbulb libraries to communicate with Discord. Image data management is done in PostGreSQL. Images hosted on Amazon Web Services S3. Bot is hosted on Heroku.
+This bot was developed using Python, relying on the hikari and lightbulb libraries to communicate with Discord. Code, database, and images are hosting on AWS EC2, RDS, and S3 respectively.
