@@ -59,10 +59,6 @@ async def command_meme(ctx: lightbulb.Context) -> None:
         tagsHashed = ["#" + t for t in tags]
         tagsSend = " ".join(tagsHashed)
 
-
-        #if success == "0":
-        #    tagsSend = f"[I don't know what '{tag}' means, so I just used this picture]\n" + tagsSend
-
         s3 = boto3.Session().resource("s3")
 
         with BytesIO() as imageBinaryDload:
@@ -76,11 +72,9 @@ async def command_meme(ctx: lightbulb.Context) -> None:
                     embed = hikari.Embed()
                 else:
                     embed = hikari.Embed(
-                        #title = f"I don't know what '{tag}' means, so I just used this picture:",
-                        description = f"I don't know what '{tag}' means, so I just used this picture:"
+                        title = f"I don't know what '{tag}' means, so I just used this picture:"
                     )
 
-                #embed = hikari.Embed()
                 embed.set_footer(tagsSend)
                 embed.set_image(imageBinarySend)
 
