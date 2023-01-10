@@ -104,13 +104,15 @@ def query_filename_by_tag(tag, conn):
     if result:
         images = [im[0] for im in result]
         imageChoice = choice(images)
+        success = "1"
     else:
         with conn.cursor() as curs:
             curs.execute("SELECT filename FROM filename")
             result = curs.fetchall()
             imageChoice = choice(result)[0]
+            success = "0"
 
-    return(imageChoice)
+    return(imageChoice, success)
 
 
 def query_tag_by_filename(filename, conn):

@@ -50,7 +50,7 @@ async def command_meme(ctx: lightbulb.Context) -> None:
 
         conn = sql_connect()
 
-        imageChoice = query_filename_by_tag(tag, conn)
+        imageChoice, success = query_filename_by_tag(tag, conn)
 
         await ctx.respond("Toasting meme...")
 
@@ -58,6 +58,10 @@ async def command_meme(ctx: lightbulb.Context) -> None:
 
         tagsHashed = ["#" + t for t in tags]
         tagsSend = " ".join(tagsHashed)
+
+
+        #if success == "0":
+        #    tagsSend = f"[I don't know what '{tag}' means, so I just used this picture]\n" + tagsSend
 
         s3 = boto3.Session().resource("s3")
 
@@ -68,13 +72,21 @@ async def command_meme(ctx: lightbulb.Context) -> None:
 
                 imageBinarySend.seek(0)
 
-                embed = hikari.Embed()
+                if success == "1":
+                    embed = hikari.Embed()
+                else:
+                    embed = hikari.Embed(
+                        title = f"I don't know what '{tag}' means, so I just used this picture"
+                    )
+
+                #embed = hikari.Embed()
                 embed.set_footer(tagsSend)
                 embed.set_image(imageBinarySend)
+
                 await ctx.respond(embed)
 
         log_request(tag=tag, caption=caption,
-                    success="1", conn=conn)
+                    success=success, conn=conn)
 
         conn.close()
 
