@@ -76,7 +76,8 @@ async def command_meme(ctx: lightbulb.Context) -> None:
                     embed = hikari.Embed()
                 else:
                     embed = hikari.Embed(
-                        title = f"I don't know what '{tag}' means, so I just used this picture"
+                        #title = f"I don't know what '{tag}' means, so I just used this picture:",
+                        description = f"I don't know what '{tag}' means, so I just used this picture:"
                     )
 
                 #embed = hikari.Embed()
