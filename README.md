@@ -16,6 +16,8 @@ And get back something like this:
 
 Most tags have more than one picture associated with them, meaning the picture you get back is semi-random.
 
+**Note**: If there's no pictures matching the tag supplied, a purely random picture will be chosen.
+
 ### Prefix Command
 Syntax:
 `toast.meme <tag> <caption>`
@@ -56,4 +58,4 @@ The following permissions are necessary for MemeToaster to work as intended:
 - Attach Files
 
 # About
-This bot was developed using Python, relying on the hikari and lightbulb libraries to communicate with Discord. Code, database, and images are hosted on AWS EC2, RDS, and S3 respectively.
+This bot was developed using Python, relying on the [hikari](https://github.com/hikari-py/hikari) and [lightbulb](https://github.com/tandemdude/hikari-lightbulb) libraries to communicate with Discord. Code, database, and images are hosted on AWS EC2, RDS, and S3 respectively.
