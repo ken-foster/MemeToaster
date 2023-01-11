@@ -8,7 +8,7 @@ If there's no pictures matching the tag supplied, a purely random picture will b
 
 # Commands
 ## meme
-Type this: `toast.meme -laugh this bot is hilarious`
+Type this: `toast.meme laugh this bot is hilarious`
 
 And get back something like this:
 
@@ -18,12 +18,12 @@ Most tags have more than one picture associated with them, meaning the picture y
 
 ### Prefix Command
 Syntax:
-toast.meme -tag caption
+`toast.meme <tag> <caption>`
 
 Example:
-toast.meme -sleep I'm exhausted and I need a nap
+`toast.meme sleep I'm exhausted and I need a nap`
 
-![toast.meme -sleep I'm exhausted and I need a nap](https://raw.githubusercontent.com/kfoster150/MemeToaster/master/data/images/README/sleep.png)
+![toast.meme sleep I'm exhausted and I need a nap](https://raw.githubusercontent.com/kfoster150/MemeToaster/master/data/images/README/sleep.png)
 
 ### Slash Command
 Example:
@@ -35,11 +35,11 @@ Example:
 ## tags
 Type this: `toast.tags`
 
-And get back a link to a list of currently available tags
+And get back a link to a list of currently available tags.
 
-You can check out this list itself here (updated continuously!): https://raw.githubusercontent.com/ken-foster/MemeToaster/main/data/tags.txt
+You can check out this list itself [here](https://raw.githubusercontent.com/ken-foster/MemeToaster/main/data/tags.txt) (updated continuously!)
 
-This is also available as a slash command: **/tags**
+This is also available as a slash command: `/tags`
 
 ## help
 Type this: `toast.help`
