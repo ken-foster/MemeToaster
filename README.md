@@ -16,8 +16,6 @@ And get back something like this:
 
 Most tags have more than one picture associated with them, meaning the picture you get back is semi-random.
 
-**Note**: If there's no pictures matching the tag supplied, a purely random picture will be chosen.
-
 ### Prefix Command
 Syntax:
 `toast.meme <tag> <caption>`
@@ -33,6 +31,8 @@ Example:
 ![these pretzels are making me thirsty](https://user-images.githubusercontent.com/38412483/162673762-856eb151-ee4e-46dc-9df4-40b5bb8c11b4.png)
 
 ![these pretzels are making me thirsty](https://user-images.githubusercontent.com/38412483/162673884-e3db9dba-0ea3-4414-9316-f488f98f13b0.png)
+
+**Note**: If there's no pictures matching the tag supplied, a purely random picture will be chosen.
 
 ## tags
 Type this: `toast.tags`
