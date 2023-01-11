@@ -1,7 +1,6 @@
 # MemeToaster
 
-Add MemeToaster to your Discord server by following this link:
-https://discord.com/api/oauth2/authorize?client_id=920060661294309378&permissions=2147535872&scope=bot
+Add MemeToaster to your Discord server by following [this link](https://discord.com/api/oauth2/authorize?client_id=920060661294309378&permissions=2147535872&scope=bot)
 
 This is a Discord bot you can use to spice up your conversations with captioned pictures, aka 'memes'. Enter in a picture category (or "tag") and a caption, and MemeToaster will randomly choose a picture from the category you supplied and caption it with the message you type.
 
@@ -38,9 +37,7 @@ Type this: `toast.tags`
 
 And get back a link to a list of currently available tags
 
-![image](https://user-images.githubusercontent.com/38412483/162674001-5585fab8-30c1-4b8c-898e-717a7342b961.png)
-
-You can check out this list itself here: https://memetoaster.s3.us-west-1.amazonaws.com/tags.txt
+You can check out this list itself here (updated continuously!): https://raw.githubusercontent.com/ken-foster/MemeToaster/main/data/tags.txt
 
 This is also available as a slash command: **/tags**
 
