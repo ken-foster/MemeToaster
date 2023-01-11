@@ -59,4 +59,4 @@ The following permissions are necessary for MemeToaster to work as intended:
 - Attach Files
 
 # About
-This bot was developed using Python, relying on the hikari and lightbulb libraries to communicate with Discord. Code, database, and images are hosting on AWS EC2, RDS, and S3 respectively.
+This bot was developed using Python, relying on the hikari and lightbulb libraries to communicate with Discord. Code, database, and images are hosted on AWS EC2, RDS, and S3 respectively.
