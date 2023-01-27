@@ -41,16 +41,12 @@ def sql_connect():
 
 
 def sql_tags(conn,
-             tagsOnly = True,
-             output = "Tuples"):
+             tagsOnly = True):
 
     if tagsOnly == True:
-        query = "SELECT tag FROM tag;"
-        columns = ["tag"]
+        query = "SELECT tag FROM tag"
     else:
         query = "SELECT * FROM tag"
-        columns = ["id","tag"]
-    
 
     with conn.cursor() as curs:
         curs.execute(query)
@@ -59,7 +55,7 @@ def sql_tags(conn,
     return(tags)
 
 
-def sql_tags_counts(conn, output = "Tuples"):
+def sql_tags_counts(conn):
 
     query_str = """
 SELECT tg.tag, count(tf.filename_id)

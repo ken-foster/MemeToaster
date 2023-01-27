@@ -14,9 +14,11 @@ pm2 = os.getenv("PM2_HOME")
 
 if pm2:
     PREFIX = "toast."
+    VERSION = "Public"
     DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_PRD",ssm)
 else:
     PREFIX = "test."
+    VERSION = "Test"
     DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_DEV",ssm)
 
 HOME_GUILD_ID = boto_ssm("HOME_GUILD_ID", ssm)
@@ -46,7 +48,7 @@ class Bot(lightbulb.BotApp):
         
         super().run(
             activity = hikari.Activity(
-                name = f"toast.help | /meme",
+                name = f"{PREFIX}help | /meme",
                 type = hikari.ActivityType.WATCHING)
         )
 
@@ -56,10 +58,10 @@ class Bot(lightbulb.BotApp):
     async def on_started(self, event: hikari.StartedEvent) -> None:
         self.scheduler.start()
         self.stdout_channel = await self.rest.fetch_channel(STDOUT_CHANNEL_ID)
-        await self.stdout_channel.send("Test Bot now online")
+        await self.stdout_channel.send(f"{VERSION} bot now online")
         logging.info("BOT READY")
 
     async def on_stopping(self, event: hikari.StoppingEvent) -> None:
-        await self.stdout_channel.send("Test Bot shutting down")
+        await self.stdout_channel.send(f"{VERSION} bot shutting down")
         self.scheduler.shutdown()
 

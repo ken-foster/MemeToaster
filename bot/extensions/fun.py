@@ -1,5 +1,5 @@
 from io import BytesIO
-from os import environ
+from os import getenv
 import string
 
 import boto3
@@ -17,8 +17,11 @@ plugin = lightbulb.Plugin("Functions")
 @lightbulb.implements(lightbulb.PrefixCommand)
 async def command_version(ctx: lightbulb.Context) -> None:
 
-    pm2 = os.getenv("PM2_HOME")
-    await ctx.respond(pm2)
+    pm2 = getenv("PM2_HOME")
+    if pm2:
+        await ctx.respond(pm2)
+    else:
+        await ctx.respond("local dev machine")
 
 
 @plugin.command
