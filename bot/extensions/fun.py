@@ -81,7 +81,8 @@ async def command_meme(ctx: lightbulb.Context) -> None:
                 embed.set_footer(tagsSend)
                 embed.set_image(imageBinarySend)
 
-                await ctx.respond(embed)
+                await ctx.edit_last_response(content="Toasting meme...DING", 
+                                             embed=embed)
 
         log_request(tag=tag, caption=caption,
                     success=success, conn=conn)
