@@ -3,13 +3,33 @@ from random import choice
 
 import boto3
 from psycopg import connect
+from sshtunnel import SSHTunnelForwarder
+
 
 def boto_ssm(Name, ssm):
     value = ssm.get_parameter(Name=Name,
     WithDecryption=True)["Parameter"]["Value"]
     return(value)
 
-def sql_connect():
+
+def ssh_connect():
+    ssm = boto3.client("ssm",region_name="us-west-1")
+
+    EC2_HOST = boto_ssm("EC2_HOST", ssm)
+    POSTGRESQL_HOST = boto_ssm("POSTGRESQL_HOST_EC2", ssm)
+
+    print("creating ssh tunnel")
+    server = SSHTunnelForwarder(
+        ssh_address_or_host=(EC2_HOST, 22),
+        ssh_username="ubuntu",
+        ssh_pkey="../MemeToaster.pem",
+        remote_bind_address=(POSTGRESQL_HOST, 5432)
+    )
+
+    return(server)
+
+
+def sql_connect(server=None):
 
     port = 5432
     user = "postgres"
@@ -19,23 +39,29 @@ def sql_connect():
 
     ssm = boto3.client("ssm",region_name="us-west-1")
 
-    if pm2:
+    POSTGRESQL_HOST = boto_ssm("POSTGRESQL_HOST_EC2", ssm)
+    POSTGRESQL_PASSWORD = boto_ssm("POSTGRESQL_PASSWORD_EC2", ssm)
 
-        POSTGRESQL_HOST = boto_ssm("POSTGRESQL_HOST_EC2", ssm)
-        POSTGRESQL_PASSWORD = boto_ssm("POSTGRESQL_PASSWORD_EC2", ssm)
+    if pm2: # connect directly
 
-    else:
+        conn = connect(
+            host = POSTGRESQL_HOST,
+            port = port,
+            user = user,
+            password = POSTGRESQL_PASSWORD,
+            dbname = dbname
+        )
 
-        POSTGRESQL_HOST = boto_ssm("POSTGRESQL_HOST_LOCAL", ssm)
-        POSTGRESQL_PASSWORD = boto_ssm("POSTGRESQL_PASSWORD_LOCAL", ssm)
+    else: # Incorporate port forwarding
 
-    conn = connect(
-        host = POSTGRESQL_HOST,
-        port = port,
-        user = user,
-        password = POSTGRESQL_PASSWORD,
-        dbname = dbname
-    )
+        conn = connect(
+            host = "localhost",
+            port = server.local_bind_port,
+            user = user,
+            password = POSTGRESQL_PASSWORD,
+            dbname = dbname)
+
+
 
     return(conn)
 
@@ -132,9 +158,6 @@ WHERE f.filename = %s;"""
     return(tags)
 
 
-
-
-
 def create_tag_list(conn):
 
     ##### Create tags list
@@ -157,6 +180,19 @@ def create_tag_list(conn):
         for tag, count in tagsList:
             newfile.write(f"{tag}\n{count}\n\n")
 
-conn = sql_connect()
+
+pm2 = os.getenv("PM2_HOME")
+
+if pm2:
+    conn = sql_connect()
+else:
+    server = ssh_connect()
+    server.start()
+
+    conn = sql_connect(server)
+
+
 create_tag_list(conn)
 conn.close()
+if not pm2:
+    server.stop()

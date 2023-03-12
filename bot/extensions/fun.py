@@ -51,7 +51,14 @@ async def command_meme(ctx: lightbulb.Context) -> None:
             str.maketrans('', '', string.punctuation + string.digits)
             ).split()[0].lower()
 
-        conn = sql_connect()
+        pm2 = getenv("PM2_HOME")
+        if pm2:
+            conn = sql_connect()
+        else:
+            server = ssh_connect()
+            server.start()
+
+            conn = sql_connect(server)        
 
         imageChoice, success = query_filename_by_tag(tag, conn)
 
@@ -88,6 +95,9 @@ async def command_meme(ctx: lightbulb.Context) -> None:
                     success=success, conn=conn)
 
         conn.close()
+        if not pm2:
+            server.stop()
+
 
     
 
