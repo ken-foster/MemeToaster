@@ -1,19 +1,31 @@
+from os import getenv
 from random import sample
 
 import hikari
 import lightbulb
 
 from bot import Bot
-from data import sql_connect, sql_tags_counts
+from data import sql_connect, ssh_connect, sql_tags_counts
 
 class ToasterHelp(lightbulb.BaseHelpCommand):
     async def send_bot_help(self, context):
         # Override this method to change the message sent when the help command
         # is run without any arguments.
 
-        conn = sql_connect()
+        pm2 = getenv("PM2_HOME")
+
+        if pm2:
+            conn = sql_connect()
+        else:
+            server = ssh_connect()
+            server.start()
+
+            conn = sql_connect(server)
+        
         tagsList = sql_tags_counts(conn)
         conn.close()
+        if not pm2:
+            server.stop()
 
         tagsOnly =[i[0] for i in tagsList]
 
@@ -58,7 +70,7 @@ Full Guide with Examples!
 https://github.com/kfoster150/MemeToaster#readme
 
 Feedback? Picture/Tag Suggestions?
-Email: `DiscordMemeToaster@gmail.com`""")
+Email: `MemeToasterDiscordBot@gmail.com`""")
 
         # send embed object
         await context.respond(embed = embed)
