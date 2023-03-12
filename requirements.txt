@@ -4,3 +4,4 @@ hikari
 hikari-lightbulb
 pillow
 psycopg[binary]
+sshtunnel
