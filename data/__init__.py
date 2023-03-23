@@ -130,7 +130,9 @@ def query_by_tag(tag, conn):
     else:
         query_random_filename = """
         SELECT filename
-        FROM filename TABLESAMPLE SYSTEM_ROWS(1)"""
+        FROM filename TABLESAMPLE BERNOULLI(1)
+        ORDER BY random()
+        LIMIT 1;"""
 
         with conn.cursor() as curs:
             curs.execute(query_random_filename)
