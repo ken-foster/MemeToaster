@@ -110,14 +110,14 @@ def log_request(tag, caption, success, conn):
     conn.commit()
 
 
-def query_filename_by_tag(tag, conn):
+def query_by_tag(tag, conn):
     query_by_tag = """
     SELECT filename FROM filename AS f
         LEFT JOIN tag_filename AS tf
         ON f.id = tf.filename_id
             LEFT JOIN tag
             ON tf.tag_id = tag.id
-    WHERE tag.tag = %s;"""
+    WHERE tag.tag = %s"""
 
     with conn.cursor() as curs:
         curs.execute(query_by_tag, (tag,))
@@ -128,10 +128,13 @@ def query_filename_by_tag(tag, conn):
         imageChoice = choice(images)
         success = "1"
     else:
+        query_random_filename = """
+        SELECT filename
+        FROM filename TABLESAMPLE SYSTEM_ROWS(1)"""
+
         with conn.cursor() as curs:
-            curs.execute("SELECT filename FROM filename")
-            result = curs.fetchall()
-            imageChoice = choice(result)[0]
+            curs.execute(query_random_filename)
+            imageChoice = curs.fetchone()[0]
             success = "0"
 
     return(imageChoice, success)

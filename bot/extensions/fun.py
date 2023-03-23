@@ -34,9 +34,9 @@ async def command_stats(ctx: lightbulb.Context) -> None:
 
 
 @plugin.command
-@lightbulb.option(name = "caption", description = "caption to attach", type = str, default = "",
+@lightbulb.option(name = "caption", description = "Caption to add to the picture", type = str, default = "",
                     modifier = lightbulb.commands.OptionModifier.CONSUME_REST)
-@lightbulb.option(name = "tag", description = "picture tag", type = str, required = True)
+@lightbulb.option(name = "tag", description = "Tag to search for", type = str, required = True)
 @lightbulb.command(name = "meme", description = "Put a picture tag and caption in the toaster")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def command_meme(ctx: lightbulb.Context) -> None:
@@ -47,9 +47,9 @@ async def command_meme(ctx: lightbulb.Context) -> None:
 {ctx.author.mention} it's a meme, not your master's thesis. Your caption has to be 125 characters or less.""")
 
     else:
-        tag = ctx.options.tag.translate(
+        tag = ctx.options.tag.lower().translate(
             str.maketrans('', '', string.punctuation + string.digits)
-            ).split()[0].lower()
+            ).split()[0]
 
         pm2 = getenv("PM2_HOME")
         if pm2:
@@ -60,7 +60,7 @@ async def command_meme(ctx: lightbulb.Context) -> None:
 
             conn = sql_connect(server)        
 
-        imageChoice, success = query_filename_by_tag(tag, conn)
+        imageChoice, success = query_by_tag(tag, conn)
 
         await ctx.respond("Toasting meme...")
 
@@ -91,7 +91,7 @@ async def command_meme(ctx: lightbulb.Context) -> None:
                 await ctx.edit_last_response(content="Toasting meme...DING", 
                                              embed=embed)
 
-        log_request(tag=tag, caption=caption,
+        log_request(tag=tags, caption=caption,
                     success=success, conn=conn)
 
         conn.close()
