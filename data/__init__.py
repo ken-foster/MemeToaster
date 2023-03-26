@@ -1,9 +1,29 @@
+import itertools
 import os
 from random import choice
+import string
 
 import boto3
 from psycopg import connect
 from sshtunnel import SSHTunnelForwarder
+
+
+with open("data/stopwords.txt") as file:
+    stopwords = file.readlines()
+
+
+def process_tags_arg(tags_arg):
+
+    # Split single string object into list
+    tags_split = tags_arg.lower().translate(
+        str.maketrans('', '', string.punctuation + string.digits)
+        ).split()
+
+    # Filter stopwords
+    tags_filtered = [tag for tag in tags_split if not tag in stopwords]
+
+    # Return
+    return(tags_filtered)
 
 
 def boto_ssm(Name, ssm):
@@ -110,14 +130,14 @@ def log_request(tag, caption, success, conn):
     conn.commit()
 
 
-def query_by_tag(tag, conn):
+def query_single_tag(tag, conn):
     query_by_tag = """
-    SELECT filename FROM filename AS f
-        LEFT JOIN tag_filename AS tf
-        ON f.id = tf.filename_id
-            LEFT JOIN tag
-            ON tf.tag_id = tag.id
-    WHERE tag.tag = %s"""
+SELECT filename FROM filename AS f
+    LEFT JOIN tag_filename AS tf
+    ON f.id = tf.filename_id
+        LEFT JOIN tag
+        ON tf.tag_id = tag.id
+WHERE tag.tag = %s"""
 
     with conn.cursor() as curs:
         curs.execute(query_by_tag, (tag,))
@@ -140,6 +160,84 @@ def query_by_tag(tag, conn):
             success = "0"
 
     return(imageChoice, success)
+
+
+def query_by_tags(tags_requested, conn):
+
+    if len(tags_requested) == 1:
+        imageChoice, success = query_single_tag(tags_requested[0], conn)
+        return(imageChoice, success)
+
+    elif len(tags_requested) < 1:
+        return("ERROR: len(tags) should be > 0")
+
+    else:
+        tags_available = set([tg[0] for tg in sql_tags(conn)])
+
+        tags_req_avail = tags_available.intersection(set(tags_requested))
+        if len(tags_req_avail) == 0:
+            imageChoice, success = query_single_tag("", conn)
+            return(imageChoice, success)
+
+        elif len(tags_req_avail) == 1:
+            imageChoice, success = query_single_tag(tags_req_avail.pop(), conn)
+            return(imageChoice, success)
+
+        else:
+            final_tags = [i for i in tags_requested if i in tags_available]
+
+            # Assemble SQL query
+            where_clause = "WHERE " + " OR ".join(["tag.tag = %s"]*len(final_tags))
+
+            query_pt1 = """
+            SELECT filename
+            FROM filename AS f
+                LEFT JOIN tag_filename AS tf
+                ON f.id = tf.filename_id
+                    LEFT JOIN tag
+                    ON tf.tag_id = tag.id
+            """
+
+            query_pt2 = """
+            GROUP BY f.filename
+            HAVING COUNT(filename) = (
+                SELECT MAX(sub.count_filename)
+                FROM (
+                    SELECT filename, count(filename) as count_filename
+                    FROM filename AS f
+                        LEFT JOIN tag_filename AS tf
+                        ON f.id = tf.filename_id
+                            LEFT JOIN tag
+                            ON tf.tag_id = tag.id
+            """
+
+            query_pt3 = """
+            GROUP BY f.filename) sub)"""
+
+            final_query = query_pt1 + where_clause + query_pt2 + where_clause + query_pt3
+
+            with conn.cursor() as curs:
+                curs.execute(final_query, tuple(final_tags*2))
+                result = curs.fetchall()
+
+            if result:
+                imageChoice = choice(
+                    [im[0] for im in result]
+                )
+                success = "1"
+            else:
+                query_random_filename = """
+                SELECT filename
+                FROM filename TABLESAMPLE BERNOULLI(1)
+                ORDER BY random()
+                LIMIT 1;"""
+
+                with conn.cursor() as curs:
+                    curs.execute(query_random_filename)
+                    imageChoice = curs.fetchone()[0]
+                success = "0"
+                
+            return(imageChoice, success)
 
 
 def query_tag_by_filename(filename, conn):
@@ -186,6 +284,7 @@ def create_tag_list(conn):
             newfile.write(f"{tag}\n{count}\n\n")
 
 
+"""
 pm2 = os.getenv("PM2_HOME")
 
 if pm2:
@@ -201,3 +300,4 @@ create_tag_list(conn)
 conn.close()
 if not pm2:
     server.stop()
+"""

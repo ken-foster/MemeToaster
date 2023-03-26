@@ -1,46 +1,79 @@
-from random import choice
-
-from data import ssh_connect, sql_connect
+import itertools
+from data import *
 
 server = ssh_connect()
 server.start()
 
 conn = sql_connect(server)
 
-###
+### CODE IN HERE ###
 
-def query_by_tag(tag, conn):
-    query_by_tag = """
-    SELECT filename FROM filename AS f
-        LEFT JOIN tag_filename AS tf
-        ON f.id = tf.filename_id
-            LEFT JOIN tag
-            ON tf.tag_id = tag.id
-    WHERE tag.tag = %s"""
+tags = ["dad","sleep"]
 
-    with conn.cursor() as curs:
-        curs.execute(query_by_tag, (tag,))
-        result = curs.fetchall()
-        
-    if result:
-        images = [im[0] for im in result]
-        imageChoice = choice(images)
-        success = "1"
-    else:
-        query_random_filename = """
-        SELECT filename
-        FROM filename TABLESAMPLE SYSTEM_ROWS(1)"""
+query = """
+SELECT filename
+FROM filename AS f
+	LEFT JOIN tag_filename AS tf
+	ON f.id = tf.filename_id
+		LEFT JOIN tag
+		ON tf.tag_id = tag.id
+WHERE tag.tag = 'letsgo'
+OR tag.tag = 'shades'
+GROUP BY f.filename
+HAVING COUNT(filename) = (
+	SELECT MAX(sub.count_filename)
+	FROM (
+		SELECT filename, count(filename) as count_filename
+		FROM filename AS f
+			LEFT JOIN tag_filename AS tf
+			ON f.id = tf.filename_id
+				LEFT JOIN tag
+				ON tf.tag_id = tag.id
+		WHERE tag.tag = 'letsgo'
+		OR tag.tag = 'shades'
+		GROUP BY f.filename ) sub);"""
 
-        with conn.cursor() as curs:
-            curs.execute(query_random_filename)
-            imageChoice = curs.fetchone()[0]
-            success = "0"
+query_pt1 = """
+SELECT filename
+FROM filename AS f
+	LEFT JOIN tag_filename AS tf
+	ON f.id = tf.filename_id
+		LEFT JOIN tag
+		ON tf.tag_id = tag.id
+"""
 
-    return(imageChoice, success)
+or_sections = " OR ".join(["tag.tag = %s"]*len(tags))
+where_clause = "WHERE " + or_sections
+
+query_pt2 = """
+GROUP BY f.filename
+HAVING COUNT(filename) = (
+	SELECT MAX(sub.count_filename)
+	FROM (
+		SELECT filename, count(filename) as count_filename
+		FROM filename AS f
+			LEFT JOIN tag_filename AS tf
+			ON f.id = tf.filename_id
+				LEFT JOIN tag
+				ON tf.tag_id = tag.id
+"""
+
+# WHERE clause
+
+query_pt3 = """
+GROUP BY f.filename) sub)"""
+
+full_query = query_pt1 + where_clause + query_pt2 + where_clause + query_pt3
+
+with conn.cursor() as curs:
+    curs.execute(full_query, tuple(tags*2))
+    result = curs.fetchall()
+
+print(result)
 
 
-imageChoice, success = query_by_tags("zzz", conn)
+### CODE IN HERE ###
 
-print(imageChoice)
-print(success)
+conn.close()
+server.stop()
 
