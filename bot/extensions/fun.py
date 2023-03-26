@@ -1,6 +1,5 @@
 from io import BytesIO
 from os import getenv
-import string
 
 import boto3
 import hikari
@@ -36,7 +35,7 @@ async def command_stats(ctx: lightbulb.Context) -> None:
 @plugin.command
 @lightbulb.option(name = "caption", description = "Caption to add to the picture", type = str, default = "",
                     modifier = lightbulb.commands.OptionModifier.CONSUME_REST)
-@lightbulb.option(name = "tag", description = "Tag to search for", type = str, required = True)
+@lightbulb.option(name = "tags", description = "Tag to search for", type = str, required = True)
 @lightbulb.command(name = "meme", description = "Put a picture tag and caption in the toaster")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def command_meme(ctx: lightbulb.Context) -> None:
@@ -47,9 +46,7 @@ async def command_meme(ctx: lightbulb.Context) -> None:
 {ctx.author.mention} it's a meme, not your master's thesis. Your caption has to be 125 characters or less.""")
 
     else:
-        tag = ctx.options.tag.lower().translate(
-            str.maketrans('', '', string.punctuation + string.digits)
-            ).split()[0]
+        tags_requested = process_tags_arg(ctx.options.tags)
 
         pm2 = getenv("PM2_HOME")
         if pm2:
@@ -60,7 +57,7 @@ async def command_meme(ctx: lightbulb.Context) -> None:
 
             conn = sql_connect(server)        
 
-        imageChoice, success = query_by_tag(tag, conn)
+        imageChoice, success = query_by_tags(tags_requested, conn)
 
         await ctx.respond("Toasting meme...")
 
@@ -82,7 +79,7 @@ async def command_meme(ctx: lightbulb.Context) -> None:
                     embed = hikari.Embed()
                 else:
                     embed = hikari.Embed(
-                        title = f"I don't know what '{tag}' means, so I just used this picture:"
+                        title = f"I couldn't find anything for {tags_requested}, so I just used this picture:"
                     )
 
                 embed.set_footer(tagsSend)
