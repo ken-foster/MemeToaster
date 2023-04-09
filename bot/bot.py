@@ -1,3 +1,4 @@
+import itertools
 import os
 import logging
 
@@ -13,13 +14,21 @@ ssm = boto3.client("ssm",region_name="us-west-1")
 pm2 = os.getenv("PM2_HOME")
 
 if pm2:
-    PREFIX = "toast."
+    base_prefix = "toast."
     VERSION = "Public"
     DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_PRD",ssm)
 else:
-    PREFIX = "test."
+    base_prefix = "test."
     VERSION = "Test"
     DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_DEV",ssm)
+
+# Use itertools to create a list of all upper/lower combinations
+# (Making the prefix command case insensitive)
+prefix_products = itertools.product(
+    *zip(base_prefix.lower(), base_prefix.upper())
+    )
+
+PREFIXES = ["".join(letters) for letters in prefix_products]
 
 HOME_GUILD_ID = boto_ssm("HOME_GUILD_ID", ssm)
 STDOUT_CHANNEL_ID = boto_ssm("STDOUT_CHANNEL_ID", ssm)
@@ -35,7 +44,7 @@ class Bot(lightbulb.BotApp):
         )
 
         super().__init__(
-            prefix = PREFIX,
+            prefix = lightbulb.when_mentioned_or(PREFIXES),
             token = DISCORD_TOKEN,
             intents = intents,
         )
@@ -48,7 +57,7 @@ class Bot(lightbulb.BotApp):
         
         super().run(
             activity = hikari.Activity(
-                name = f"{PREFIX}help | /meme",
+                name = f"{base_prefix}help | /meme",
                 type = hikari.ActivityType.WATCHING)
         )
 
