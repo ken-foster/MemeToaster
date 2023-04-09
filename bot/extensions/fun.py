@@ -12,6 +12,23 @@ from data import *
 plugin = lightbulb.Plugin("Functions")
 
 @plugin.command
+@lightbulb.command(name="nsfw", description="check if channel is nsfw")
+@lightbulb.implements(lightbulb.PrefixCommand)
+async def command_version(ctx: lightbulb.Context) -> None:
+
+    ch_id = ctx.channel_id
+
+    plugin.app.rest.get_ch
+
+    ch_obj = ctx.get_channel()
+
+    print(type(ch_obj))
+
+    #await ctx.respond(ctx.channel_id)
+
+
+
+@plugin.command
 @lightbulb.command(name="version", description="For testing env vars")
 @lightbulb.implements(lightbulb.PrefixCommand)
 async def command_version(ctx: lightbulb.Context) -> None:
@@ -64,6 +81,7 @@ async def command_meme(ctx: lightbulb.Context) -> None:
 
             conn = sql_connect(server)        
 
+        #imageChoice, success = query_by_tags(tags_filtered, nsfw_tf, conn)
         imageChoice, success = query_by_tags(tags_filtered, conn)
 
         await ctx.respond("Toasting meme...")
