@@ -18,13 +18,9 @@ async def command_version(ctx: lightbulb.Context) -> None:
 
     ch_id = ctx.channel_id
 
-    plugin.app.rest.get_ch
+    ch_obj = await plugin.app.rest.fetch_channel(ch_id)
 
-    ch_obj = ctx.get_channel()
-
-    print(type(ch_obj))
-
-    #await ctx.respond(ctx.channel_id)
+    await ctx.respond(ch_obj.is_nsfw)
 
 
 
@@ -79,10 +75,13 @@ async def command_meme(ctx: lightbulb.Context) -> None:
             server = ssh_connect()
             server.start()
 
-            conn = sql_connect(server)        
+            conn = sql_connect(server)
 
-        #imageChoice, success = query_by_tags(tags_filtered, nsfw_tf, conn)
-        imageChoice, success = query_by_tags(tags_filtered, conn)
+        # Get age-restricted status
+        ch_obj = await plugin.app.rest.fetch_channel(ctx.channel_id)
+        agerestrict = ch_obj.is_nsfw
+
+        imageChoice, success = query_by_tags(tags_filtered, agerestrict, conn)
 
         await ctx.respond("Toasting meme...")
 

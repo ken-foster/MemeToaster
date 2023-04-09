@@ -137,14 +137,18 @@ def log_request(tags, caption, success, conn) -> None:
     conn.commit()
 
 
-def query_single_tag(tag, conn):
+def query_single_tag(tag, agerestrict, conn):
     query_by_tag = """
 SELECT filename FROM filename AS f
     LEFT JOIN tag_filename AS tf
     ON f.id = tf.filename_id
         LEFT JOIN tag
         ON tf.tag_id = tag.id
-WHERE tag.tag = %s"""
+WHERE tag.tag = %s
+"""
+
+    if not agerestrict:
+        query_by_tag += "AND f.agerestrict = 'false'"
 
     with conn.cursor() as curs:
         curs.execute(query_by_tag, (tag,))
@@ -158,6 +162,7 @@ WHERE tag.tag = %s"""
         query_random_filename = """
         SELECT filename
         FROM filename TABLESAMPLE BERNOULLI(1)
+        WHERE agerestrict = 'false'
         ORDER BY random()
         LIMIT 1"""
 
@@ -169,10 +174,10 @@ WHERE tag.tag = %s"""
     return(imageChoice, success)
 
 
-def query_by_tags(tags_requested, conn):
+def query_by_tags(tags_requested, agerestrict, conn):
 
     if len(tags_requested) == 1:
-        imageChoice, success = query_single_tag(tags_requested[0], conn)
+        imageChoice, success = query_single_tag(tags_requested[0], agerestrict, conn)
         return(imageChoice, success)
 
     elif len(tags_requested) < 1:
@@ -183,18 +188,22 @@ def query_by_tags(tags_requested, conn):
 
         tags_req_avail = tags_available.intersection(set(tags_requested))
         if len(tags_req_avail) == 0:
-            imageChoice, success = query_single_tag("", conn)
+            imageChoice, success = query_single_tag("", agerestrict, conn)
             return(imageChoice, success)
 
         elif len(tags_req_avail) == 1:
-            imageChoice, success = query_single_tag(tags_req_avail.pop(), conn)
+            imageChoice, success = query_single_tag(tags_req_avail.pop(), agerestrict, conn)
             return(imageChoice, success)
 
         else:
             final_tags = [i for i in tags_requested if i in tags_available]
 
             # Assemble SQL query
-            where_clause = "WHERE " + " OR ".join(["tag.tag = %s"]*len(final_tags))
+            where_clause = "WHERE (" + " OR ".join(["tag.tag = %s"]*len(final_tags)) + ")"
+
+            if not agerestrict:
+                where_clause += "AND f.agerestrict = 'false'"
+            
 
             query_pt1 = """
             SELECT filename
