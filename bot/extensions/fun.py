@@ -12,6 +12,19 @@ from data import *
 plugin = lightbulb.Plugin("Functions")
 
 @plugin.command
+@lightbulb.command(name="nsfw", description="check if channel is nsfw")
+@lightbulb.implements(lightbulb.PrefixCommand)
+async def command_version(ctx: lightbulb.Context) -> None:
+
+    ch_id = ctx.channel_id
+
+    ch_obj = await plugin.app.rest.fetch_channel(ch_id)
+
+    await ctx.respond(ch_obj.is_nsfw)
+
+
+
+@plugin.command
 @lightbulb.command(name="version", description="For testing env vars")
 @lightbulb.implements(lightbulb.PrefixCommand)
 async def command_version(ctx: lightbulb.Context) -> None:
@@ -62,9 +75,13 @@ async def command_meme(ctx: lightbulb.Context) -> None:
             server = ssh_connect()
             server.start()
 
-            conn = sql_connect(server)        
+            conn = sql_connect(server)
 
-        imageChoice, success = query_by_tags(tags_filtered, conn)
+        # Get age-restricted status
+        ch_obj = await plugin.app.rest.fetch_channel(ctx.channel_id)
+        agerestrict = ch_obj.is_nsfw
+
+        imageChoice, success = query_by_tags(tags_filtered, agerestrict, conn)
 
         await ctx.respond("Toasting meme...")
 
