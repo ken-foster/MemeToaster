@@ -12,15 +12,10 @@ with open("data/stopwords.txt") as file:
     stopwords = file.readlines()
 
 
-def process_tags_arg(tags_arg):
-
-    # Split single string object into list
-    tags_split = tags_arg.lower().translate(
-        str.maketrans('', '', string.punctuation + string.digits)
-        ).split()
+def filter_stopwords(tags: list) -> list:
 
     # Filter stopwords
-    tags_filtered = [tag for tag in tags_split if not tag in stopwords]
+    tags_filtered = [tag for tag in tags if not tag in stopwords]
 
     # Return
     return(tags_filtered)
@@ -119,14 +114,26 @@ ORDER BY count(tf.filename_id) DESC, tg.tag;"""
     return(tags)
 
 
-def log_request(tag, caption, success, conn):
+def log_request(tags, caption, success, conn) -> None:
 
+    # Query for retrieving last request_id
+    request_id_string = """
+    SELECT request_id
+    FROM request_log
+    ORDER BY id DESC
+    LIMIT 1"""
+
+    # Query for entering a new log entry
     log_tag_string = """
-    INSERT INTO request_log (tag, caption, success)
-    VALUES (%s, %s, %s)"""
+    INSERT INTO request_log (tag, caption, success, request_id)
+    VALUES (%s, %s, %s, %s)"""
 
     with conn.cursor() as curs:
-        curs.execute(log_tag_string, (tag, caption, success,))
+        curs.execute(request_id_string)
+        request_id = str(curs.fetchone()[0] + 1)
+
+        for tag in tags:
+            curs.execute(log_tag_string, (tag, caption, success, request_id,))
     conn.commit()
 
 

@@ -33,20 +33,27 @@ async def command_stats(ctx: lightbulb.Context) -> None:
 
 
 @plugin.command
-@lightbulb.option(name = "caption", description = "Caption to add to the picture", type = str, default = "",
+@lightbulb.option(name = "caption", description = "Caption to add to the picture (125 chars or less)", type = str, default = "",
                     modifier = lightbulb.commands.OptionModifier.CONSUME_REST)
-@lightbulb.option(name = "tags", description = "Tag to search for", type = str, required = True)
+@lightbulb.option(name = "tags", description = "Tags to search for (up to 10 words)", type = str, required = True)
 @lightbulb.command(name = "meme", description = "Put a picture tag and caption in the toaster")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def command_meme(ctx: lightbulb.Context) -> None:
     caption = ctx.options.caption.strip()
+    tags_requested = ctx.options.tags.lower().translate(
+        str.maketrans('', '', string.punctuation + string.digits)
+        ).split()
 
     if len(caption) > 125:
-                await ctx.respond(f"""
+        await ctx.respond(f"""
 {ctx.author.mention} it's a meme, not your master's thesis. Your caption has to be 125 characters or less.""")
 
+    elif len(tags_requested) > 10:
+        await ctx.respond(f"""
+{ctx.author.mention} that request was way too specific. You can only search up to 10 words at a time.""")
+
     else:
-        tags_requested = process_tags_arg(ctx.options.tags)
+        tags_filtered = filter_stopwords(tags_requested)
 
         pm2 = getenv("PM2_HOME")
         if pm2:
@@ -57,13 +64,13 @@ async def command_meme(ctx: lightbulb.Context) -> None:
 
             conn = sql_connect(server)        
 
-        imageChoice, success = query_by_tags(tags_requested, conn)
+        imageChoice, success = query_by_tags(tags_filtered, conn)
 
         await ctx.respond("Toasting meme...")
 
-        tags = query_tag_by_filename(imageChoice, conn)
+        imageChoice_tags = query_tag_by_filename(imageChoice, conn)
 
-        tagsHashed = ["#" + t for t in tags]
+        tagsHashed = ["#" + t for t in imageChoice_tags]
         tagsSend = " ".join(tagsHashed)
 
         s3 = boto3.Session().resource("s3")
@@ -88,7 +95,7 @@ async def command_meme(ctx: lightbulb.Context) -> None:
                 await ctx.edit_last_response(content="Toasting meme...DING", 
                                              embed=embed)
 
-        log_request(tag=tags, caption=caption,
+        log_request(tags=tags_requested, caption=caption,
                     success=success, conn=conn)
 
         conn.close()
