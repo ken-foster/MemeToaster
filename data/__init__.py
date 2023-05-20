@@ -114,6 +114,17 @@ ORDER BY count(tf.filename_id) DESC, tg.tag;"""
     return(tags)
 
 
+def log_error(code, msg, conn) -> None:
+    log_error_string = """
+    INSERT INTO error_log (code, msg)
+    VALUES (%s, %s)"""
+
+    with conn.cursor() as curs:
+        curs.execute(log_error_string, (code, msg,))
+    
+    conn.commit()
+
+
 def log_request(tags, caption, success, conn) -> None:
 
     # Query for retrieving last request_id
