@@ -53,29 +53,35 @@ async def command_stats(ctx: lightbulb.Context) -> None:
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def command_meme(ctx: lightbulb.Context) -> None:
     caption = ctx.options.caption.strip()
+    
     tags_requested = ctx.options.tags.lower().translate(
         str.maketrans('', '', string.punctuation + string.digits)
         ).split()
+
+    pm2 = getenv("PM2_HOME")
+
+    if pm2:
+        conn = sql_connect()
+    else:
+        server = ssh_connect()
+        server.start()
+
+        conn = sql_connect(server)
 
     if len(caption) > 125:
         await ctx.respond(f"""
 {ctx.author.mention} it's a meme, not your master's thesis. Your caption has to be 125 characters or less.""")
 
+        log_error(0, "Caption length > 125", conn)
+
     elif len(tags_requested) > 10:
         await ctx.respond(f"""
 {ctx.author.mention} that request was way too specific. You can only search up to 10 words at a time.""")
 
+        log_error(1, "N Tags > 10", conn)
+
     else:
         tags_filtered = filter_stopwords(tags_requested)
-
-        pm2 = getenv("PM2_HOME")
-        if pm2:
-            conn = sql_connect()
-        else:
-            server = ssh_connect()
-            server.start()
-
-            conn = sql_connect(server)
 
         # Get age-restricted status
         ch_obj = await plugin.app.rest.fetch_channel(ctx.channel_id)
