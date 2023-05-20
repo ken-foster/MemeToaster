@@ -17,6 +17,8 @@ And get back something like this:
 Most tags have more than one picture associated with them, meaning the picture you get back is semi-random.
 
 ### Slash Command
+This is the best way to invoke the MemeToaster, as it's currently the only way to use multiple tags in a single query.
+
 Example:
 **/meme** `tags: wat`  `caption: these pretzels are making me thirsty`
 ![these pretzels are making me thirsty](https://user-images.githubusercontent.com/38412483/162673762-856eb151-ee4e-46dc-9df4-40b5bb8c11b4.png)
@@ -30,6 +32,15 @@ Example: **/meme** `tags: spongebob music`  `caption: SWEET VICTORY!!`
 ![SWEET VICTORY](/data/images/README/slash_multiple.png)
 
 ![SWEET VICTORY](/data/images/README/sweet_victory.png)
+
+### @ Command
+Syntax:
+`@MemeToaster <tag> <caption>`
+
+Exaample:
+`@MemeToaster clown this tastes funny`
+
+![@MemeToaster clown this tastes funny](/data/images/README/clown.png)
 
 ### Prefix Command
 Syntax:
@@ -45,7 +56,7 @@ Example:
 **Note**: If there's no pictures matching the tag supplied, a purely random picture will be chosen.
 
 ## tags
-Type this: `toast.tags`
+Type `toast.tags` or `@MemeToaster tags`
 
 And get back a link to a list of currently available tags.
 
@@ -54,7 +65,7 @@ You can check out this list itself [here](https://raw.githubusercontent.com/ken-
 This is also available as a slash command: `/tags`
 
 ## help
-Type this: `toast.help`
+Type `toast.help` or `@MemeToaster help`
 
 And receive a quick review on how to use MemeToaster, including a link to this README.
 
