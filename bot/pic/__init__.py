@@ -42,7 +42,6 @@ def render(imageBinary, caption) -> Image:
     w_limit = round(w - margin*2)
 
     wrapped_caption = wrap_text(caption, font, w_limit)
-    print(font.getbbox(wrapped_caption))
 
     draw.multiline_text((w/2, h*0.75), text=wrapped_caption,
                         font=font, stroke_width=stroke_width,
