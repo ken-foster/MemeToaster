@@ -18,7 +18,9 @@ def wrap_text(text, font, max_width):
                 i += 1
             lines.append(line)
 
-    return(lines)
+    wrapped_text = "\n".join(lines)
+
+    return(wrapped_text)
 
 def render(imageBinary, caption) -> Image:
 
@@ -29,7 +31,7 @@ def render(imageBinary, caption) -> Image:
     # Font size ~= (image width + image height)/20
     # Font line width ~= (font size)/25
     w, h = img.size
-    font_size = round((w + h)/20)
+    font_size = round((w + h)/25)
 
     stroke_width = round(font_size/25)
 
@@ -39,22 +41,12 @@ def render(imageBinary, caption) -> Image:
     margin = round(w/25)
     w_limit = round(w - margin*2)
 
-    caption_wrapped = wrap_text(caption, font, w_limit)
+    wrapped_caption = wrap_text(caption, font, w_limit)
 
-    heights = []
-    for i in range(0, len(caption_wrapped)):
-        heights.append( font.getbbox(caption_wrapped[i])[3] )
-
-    t_height = sum(heights)
-
-    if t_height < h/2 - margin:
-        offset = round(h/2) - margin
-    else:
-        offset = h - t_height - margin
-
-    for line in caption_wrapped:
-        draw.text((margin, offset), line, font = font, stroke_width=stroke_width, stroke_fill ='black')
-        offset += font.getbbox(line)[3]
+    draw.multiline_text((w/2, h*0.75), text=wrapped_caption,
+                        font=font, stroke_width=stroke_width,
+                        stroke_fill="black", align="center",
+                        anchor="mm")
 
     # Add watermark
     wm = Image.open('./data/images/watermark transparent.png')
