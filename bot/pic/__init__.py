@@ -31,7 +31,7 @@ def render(imageBinary, caption) -> Image:
     # Font size ~= (image width + image height)/20
     # Font line width ~= (font size)/25
     w, h = img.size
-    font_size = round((w + h)/25)
+    font_size = round((w + h)/23)
 
     stroke_width = round(font_size/25)
 
