@@ -66,7 +66,7 @@ class ToasterHelp(lightbulb.BaseHelpCommand):
         embed.add_field(name = '\u200b', value = """
 Type `/tags` for more options
 
-Full Guide with Examples!
+Add the bot to your own server at the link below!
 https://github.com/kfoster150/MemeToaster#readme
 
 Feedback? Picture/Tag Suggestions?
