@@ -52,11 +52,11 @@ async def command_stats(ctx: lightbulb.Context) -> None:
 @lightbulb.command(name = "meme", description = "Put a picture tag and caption in the toaster")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def command_meme(ctx: lightbulb.Context) -> None:
-    caption = ctx.options.caption.strip()
+    caption = ctx.options.caption.strip()[:125]
     
     tags_requested = ctx.options.tags.lower().translate(
         str.maketrans('', '', string.punctuation + string.digits)
-        ).split()
+        ).split()[:10]
 
     pm2 = getenv("PM2_HOME")
 
@@ -67,63 +67,50 @@ async def command_meme(ctx: lightbulb.Context) -> None:
         server.start()
 
         conn = sql_connect(server)
+        
+    tags_filtered = filter_stopwords(tags_requested)
 
-    if len(caption) > 125:
-        await ctx.respond(f"""
-{ctx.author.mention} it's a meme, not your master's thesis. Your caption has to be 125 characters or less.""")
+    # Get age-restricted status
+    ch_obj = await plugin.app.rest.fetch_channel(ctx.channel_id)
+    agerestrict = ch_obj.is_nsfw
 
-        log_error(0, "Caption length > 125", conn)
+    imageChoice, success = query_by_tags(tags_filtered, agerestrict, conn)
 
-    elif len(tags_requested) > 10:
-        await ctx.respond(f"""
-{ctx.author.mention} that request was way too specific. You can only search up to 10 words at a time.""")
+    await ctx.respond("Toasting meme...")
 
-        log_error(1, "N Tags > 10", conn)
+    imageChoice_tags = query_tag_by_filename(imageChoice, conn)
 
-    else:
-        tags_filtered = filter_stopwords(tags_requested)
+    tagsHashed = ["#" + t for t in imageChoice_tags]
+    tagsSend = " ".join(tagsHashed)
 
-        # Get age-restricted status
-        ch_obj = await plugin.app.rest.fetch_channel(ctx.channel_id)
-        agerestrict = ch_obj.is_nsfw
+    s3 = boto3.Session().resource("s3")
 
-        imageChoice, success = query_by_tags(tags_filtered, agerestrict, conn)
+    with BytesIO() as imageBinaryDload:
+        with BytesIO() as imageBinarySend:
+            s3.Bucket('memetoaster').download_fileobj('images/db/' + imageChoice, imageBinaryDload)
+            render(imageBinaryDload, caption).save(imageBinarySend, 'JPEG')
 
-        await ctx.respond("Toasting meme...")
+            imageBinarySend.seek(0)
 
-        imageChoice_tags = query_tag_by_filename(imageChoice, conn)
+            if success == "1":
+                embed = hikari.Embed()
+            else:
+                embed = hikari.Embed(
+                    title = f"I couldn't find anything for {tags_requested}, so I just used this picture:"
+                )
 
-        tagsHashed = ["#" + t for t in imageChoice_tags]
-        tagsSend = " ".join(tagsHashed)
+            embed.set_footer(tagsSend)
+            embed.set_image(imageBinarySend)
 
-        s3 = boto3.Session().resource("s3")
+            await ctx.edit_last_response(content="Toasting meme...DING", 
+                                            embed=embed)
 
-        with BytesIO() as imageBinaryDload:
-            with BytesIO() as imageBinarySend:
-                s3.Bucket('memetoaster').download_fileobj('images/db/' + imageChoice, imageBinaryDload)
-                render(imageBinaryDload, caption).save(imageBinarySend, 'JPEG')
+    log_request(tags=tags_requested, caption=caption,
+                success=success, conn=conn)
 
-                imageBinarySend.seek(0)
-
-                if success == "1":
-                    embed = hikari.Embed()
-                else:
-                    embed = hikari.Embed(
-                        title = f"I couldn't find anything for {tags_requested}, so I just used this picture:"
-                    )
-
-                embed.set_footer(tagsSend)
-                embed.set_image(imageBinarySend)
-
-                await ctx.edit_last_response(content="Toasting meme...DING", 
-                                             embed=embed)
-
-        log_request(tags=tags_requested, caption=caption,
-                    success=success, conn=conn)
-
-        conn.close()
-        if not pm2:
-            server.stop()
+    conn.close()
+    if not pm2:
+        server.stop()
 
 
     
