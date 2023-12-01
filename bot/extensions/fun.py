@@ -4,6 +4,7 @@ from os import getenv
 import boto3
 import hikari
 import lightbulb
+import string
 
 from bot import Bot
 from bot.pic import render
