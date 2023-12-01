@@ -1,7 +1,5 @@
-import itertools
 import os
 from random import choice
-import string
 
 import boto3
 from psycopg import connect
@@ -311,20 +309,28 @@ def create_tag_list(conn):
             newfile.write(f"{tag}\n{count}\n\n")
 
 
-"""
-pm2 = os.getenv("PM2_HOME")
+def get_tags_from_unicode(unicode_requested, conn):
 
-if pm2:
-    conn = sql_connect()
-else:
-    server = ssh_connect()
-    server.start()
+    # Assemble query
+    base_query = "SELECT DISTINCT tag FROM emoji "
 
-    conn = sql_connect(server)
+    if len(unicode_requested) == 1:
+        where_clause = "WHERE unicode = %s"
 
+    elif len(unicode_requested) > 1:
+        where_clause = "WHERE (" + " OR ".join(["unicode = %s"]*len(unicode_requested)) + ")"
+    
+    tag_from_unicode_query = base_query + where_clause
 
-create_tag_list(conn)
-conn.close()
-if not pm2:
-    server.stop()
-"""
+    # get tags
+    with conn.cursor() as curs:
+        curs.execute(tag_from_unicode_query, tuple(unicode_requested))
+        result = curs.fetchall()
+        
+    if result:
+        tags_requested = [tg[0] for tg in result]
+
+    else:
+        tags_requested = ["uuu"]
+
+    return(tags_requested)
