@@ -132,7 +132,7 @@ async def command_meme(ctx: lightbulb.Context) -> None:
 @plugin.command
 @lightbulb.option(name = "caption", description = "Caption to add to the picture (125 chars or less)", type = str, default = "",
                     modifier = lightbulb.commands.OptionModifier.CONSUME_REST)
-@lightbulb.option(name = "emoji", description = "Emoji(s) to search a matching picture for (Up to 10)", type = str, required = True)
+@lightbulb.option(name = "emoji", description = "Emoji to search a matching picture for", type = str, required = True)
 @lightbulb.command(name = "emoji", description="[BETA] Create meme with an emoji and caption")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def command_emoji(ctx: lightbulb.Context) -> None:
