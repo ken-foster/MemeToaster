@@ -20,14 +20,14 @@ Most tags have more than one picture associated with them, meaning the picture y
 This is the best way to invoke the MemeToaster, as it's currently the only way to use multiple tags in a single query.
 
 Example:
-**/meme** `tags: wat`  `caption: these pretzels are making me thirsty`
+**`/meme`** `tags: wat`  `caption: these pretzels are making me thirsty`
 ![these pretzels are making me thirsty](https://user-images.githubusercontent.com/38412483/162673762-856eb151-ee4e-46dc-9df4-40b5bb8c11b4.png)
 
 ![these pretzels are making me thirsty](https://user-images.githubusercontent.com/38412483/162673884-e3db9dba-0ea3-4414-9316-f488f98f13b0.png)
 
-**NEW (2023-03-26)**: Use multiple tags to attempt a more specific picture request. This is only available in the slash command
+**Multiple Tags**: Use multiple tags to attempt a more specific picture request. This is only available in the slash command
 
-Example: **/meme** `tags: spongebob music`  `caption: SWEET VICTORY!!`
+Example: **`/meme`** `tags: spongebob music`  `caption: SWEET VICTORY!!`
 
 ![SWEET VICTORY](/data/images/README/slash_multiple.png)
 
@@ -35,10 +35,10 @@ Example: **/meme** `tags: spongebob music`  `caption: SWEET VICTORY!!`
 
 ### @ Command
 Syntax:
-`@MemeToaster <tag> <caption>`
+`@MemeToaster meme <tag> <caption>`
 
 Exaample:
-`@MemeToaster clown this tastes funny`
+`@MemeToaster meme clown this tastes funny`
 
 ![@MemeToaster clown this tastes funny](/data/images/README/clown.png)
 
@@ -51,9 +51,62 @@ Example:
 
 ![toast.meme sleep I'm exhausted and I need a nap](https://raw.githubusercontent.com/kfoster150/MemeToaster/master/data/images/README/sleep.png)
 
-
-
 **Note**: If there's no pictures matching the tag supplied, a purely random picture will be chosen.
+
+
+
+
+
+
+## emoji [BETA]
+Type this: `toast.emoji ☹️ I'm having a hard day`
+
+And get back something like this:
+
+![I'm having a hard day](/data/images/README/hard-day.png)
+
+Eventually, every default emoji in Discord will have some images associated with it. Current progress on this goal:
+
+```
+PEOPLE    100%
+NATURE     41%
+FOOD       43%
+ACTIVITY   22%
+TRAVEL     34%
+OBJECTS    15%
+SYMBOLS    16%
+FLAGS      Not Supported
+```
+- Custom emojis can be supplied and MemeToaster will attempt to find a matching image for them, but the chaotic nature of custom emoji names means it's unlikely there will be a match.
+- If there's no pictures matching the emoji supplied, a purely random picture will be returned. 
+
+### Slash Command
+
+Example:
+**`/emoji`** `emoji: 🍕`  `caption: I'm craving pizza`
+
+![I'm craving pizza](/data/images/README/pizza_request.png)
+
+![I'm craving pizza](/data/images/README/pizza_result.png)
+
+### @ Command
+Syntax:
+`@MemeToaster emoji <tag> <caption>`
+
+Example:
+`@MemeToaster 😈 I'm feeling evil today`
+
+![I'm feeling evil today](/data/images/README/evil.png)
+
+### Prefix Command
+Syntax:
+`toast.emoji <tag> <caption>`
+
+Example:
+`toast.emoji 👏 great job`
+
+![great job](/data/images/README/clap.png)
+
 
 ## tags
 Type `toast.tags` or `@MemeToaster tags`
