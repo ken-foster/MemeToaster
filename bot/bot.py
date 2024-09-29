@@ -66,6 +66,7 @@ class Bot(lightbulb.BotApp):
         )
 
         # Refresh tags list
+        # Note: This does not "save" until the bot is restarted again.
         conn = sql_connect(server=server)
         create_tag_list(conn=conn)
         conn.close()

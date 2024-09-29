@@ -297,7 +297,7 @@ def create_tag_list(conn):
         cur.execute("SELECT COUNT(id) FROM filename;")
         num_pics = cur.fetchone()[0]
 
-    # Write to file
+    # Write to StringIO, Create S3 session, and upload
     inptstr = 'data/tags.txt'
     with open(inptstr, 'w') as newfile:
 
