@@ -7,18 +7,22 @@ import boto3
 import hikari
 import lightbulb
 
-from data import boto_ssm
+from data import boto_ssm, ssh_connect, sql_connect, create_tag_list
+
 
 ssm = boto3.client("ssm",region_name="us-west-1")
-
 pm2 = os.getenv("PM2_HOME")
+
 
 if pm2:
     base_prefix = "toast."
+    server = None
     VERSION = "Public"
     DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_PRD",ssm)
 else:
     base_prefix = "test."
+    server = ssh_connect()
+    server.start()
     VERSION = "Test"
     DISCORD_TOKEN = boto_ssm("DISCORD_TOKEN_DEV",ssm)
 
@@ -60,6 +64,13 @@ class Bot(lightbulb.BotApp):
                 name = f"{base_prefix}help | /meme",
                 type = hikari.ActivityType.WATCHING)
         )
+
+        # Refresh tags list
+        conn = sql_connect(server=server)
+        create_tag_list(conn=conn)
+        conn.close()
+        if server:
+            server.stop()
 
     async def on_starting(self, event: hikari.StartedEvent) -> None:
         self.load_extensions_from("./bot/extensions/")
